@@ -164,5 +164,3 @@ class PaginatorViewsTest(TestCase):
         response = self.authorized_client.get(
             reverse('posts:profile', kwargs={'username': 'auth'}) + '?page=2')
         self.assertEqual(len(response.context['page_obj']), 3)
-
-    

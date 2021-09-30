@@ -1,4 +1,3 @@
-    
 from django.contrib.auth import get_user_model
 
 from django.test import Client, TestCase
@@ -30,7 +29,7 @@ class PostPagesTests(TestCase):
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
         self.authorized_client.force_login(self.post.author)
-    
+
     def test_cache_index(self):
         post = Post.objects.create(
             text='тест кэша',
