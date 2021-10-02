@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
-from ..models import Group, Post
+from ..models import Follow, Group, Post
 from http import HTTPStatus
 from django.core.cache import cache
 
@@ -21,6 +21,10 @@ class PostURLTests(TestCase):
             author=cls.user,
             text='test-group',
             group=cls.group,
+        )
+        cls.follow = Follow.objects.create(
+            author=cls.user,
+            user=cls.user
         )
 
     def setUp(self):
@@ -87,3 +91,17 @@ class PostURLTests(TestCase):
         )
         self.assertRedirects(
             response, '/auth/login/?next=/posts/1/comment/')
+
+    def test_follow_url_exists_at_desired_location_authorized(self):
+        """Страница 'profile/<str:username>/follow/' доступна авторизованному
+        пользователю."""
+        response = self.authorized_client.get(
+            '/profile/auth/follow/')
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+
+    def test_unfollow_url_exists_at_desired_location_authorized(self):
+        """Страница 'profile/<str:username>/unfollow/' доступна авторизованному
+        пользователю."""
+        response = self.authorized_client.get(
+            '/profile/auth/unfollow/')
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)

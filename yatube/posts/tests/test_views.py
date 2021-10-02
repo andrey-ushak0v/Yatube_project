@@ -1,11 +1,11 @@
-
 from django.contrib.auth import get_user_model
-
 from django.test import Client, TestCase
 from django.urls import reverse
-from ..models import Group, Post
+from ..models import Group, Post, Follow
 from django import forms
 from django.core.cache import cache
+
+
 User = get_user_model()
 
 
@@ -166,3 +166,33 @@ class PaginatorViewsTest(TestCase):
         response = self.authorized_client.get(
             reverse('posts:profile', kwargs={'username': 'auth'}) + '?page=2')
         self.assertEqual(len(response.context['page_obj']), 3)
+
+
+class FollowTest(TestCase):
+
+    def setUp(self):
+        self.follower = User.objects.create_user(username='Follower')
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.follower)
+        self.author = User.objects.create_user(username='author')
+        self.post_author = Post.objects.create(
+            text='текст',
+            author=self.author,
+        )
+
+    def test_follow(self):
+        follow = Follow.objects.count()
+        self.assertTrue(self.authorized_client.get(
+            reverse('posts:profile_follow', args={self.author}))
+        )
+        self.assertEqual(Follow.objects.count(), follow + 1)
+        last_follow = Follow.objects.latest('id')
+        self.assertEqual(last_follow.author_id, self.author.id)
+        self.assertEqual(last_follow.user_id, self.follower.id)
+
+    def test_unfollow(self):
+        follow = Follow.objects.count()
+        self.assertTrue(self.authorized_client.get(
+            reverse('posts:profile_unfollow', args={self.author}))
+        )
+        self.assertEqual(Follow.objects.count(), follow)

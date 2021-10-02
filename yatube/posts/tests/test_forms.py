@@ -2,11 +2,13 @@ import tempfile
 import shutil
 from django.contrib.auth import get_user_model
 from posts.forms import PostForm
-from posts.models import Post, Group
+from posts.models import Post, Group, Comment
 from django.conf import settings
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
+from http import HTTPStatus
+
 
 User = get_user_model()
 
@@ -28,6 +30,11 @@ class PostFormTests(TestCase):
             author=cls.user,
             text='text',
             group=cls.group,
+        )
+        cls.comment = Comment.objects.create(
+            text='текст',
+            post=cls.post,
+            author=cls.user
         )
         cls.form = PostForm()
 
@@ -94,4 +101,22 @@ class PostFormTests(TestCase):
             follow=True
         )
         self.assertEqual(Post.objects.count(), post_count)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    def test_create_comment(self):
+        comment_count = Comment.objects.count()
+        form_data = {
+            'text': 'текст',
+        }
+
+        response = self.authorized_client.post(
+            reverse('posts:add_comment', kwargs={'post_id': self.post.id}),
+            data=form_data,
+            follow=True
+        )
+        self.assertRedirects(response, reverse(
+            'posts:post_detail', kwargs={'post_id': self.post.id})
+        )
+        self.assertEqual(Comment.objects.count(), comment_count + 1)
+        self.assertEqual(Comment.objects.filter(
+            id=self.post.id).last().text, form_data['text'])

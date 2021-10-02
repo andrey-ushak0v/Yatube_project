@@ -79,15 +79,15 @@ class Comment(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="comments",
-        verbose_name="автор"
+        related_name='comments',
+        verbose_name='автор'
     )
     text = models.TextField(
-        verbose_name="текст комментария",
-        help_text="Введите текст комментария"
+        verbose_name='текст комментария',
+        help_text='Введите текст комментария'
     )
     created = models.DateTimeField(
-        verbose_name="Дата публикации",
+        verbose_name='Дата публикации',
         auto_now_add=True
     )
     active = models.BooleanField(default=True)
@@ -96,7 +96,7 @@ class Comment(models.Model):
         ordering = ('created', )
 
     def __str__(self):
-        return self.text
+        return self.text[:15]
 
 
 class Follow(models.Model):
@@ -114,6 +114,10 @@ class Follow(models.Model):
         verbose_name='автор',
         help_text='тот на кого подписываются'
     )
+
+    class Meta:
+        constraints = [models.UniqueConstraint(
+            fields=['author', 'user'], name='unique pair')]
 
     def __str__(self):
         return self.user
