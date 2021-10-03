@@ -17,8 +17,8 @@ class Group(models.Model):
         unique=True,
         db_index=True,
         default=None,
-        help_text='Введите путь',
-        verbose_name='путь'
+        help_text='Введите слаг',
+        verbose_name='слаг'
     )
     description = models.TextField(
         default=None,
@@ -94,6 +94,8 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ('created', )
+        verbose_name = 'комментарий'
+        verbose_name_plural = 'комментарии'
 
     def __str__(self):
         return self.text[:15]
@@ -116,8 +118,8 @@ class Follow(models.Model):
     )
 
     class Meta:
-        constraints = [models.UniqueConstraint(
-            fields=['author', 'user'], name='unique pair')]
+        constraints = (models.UniqueConstraint(
+            fields=('author', 'user', ), name='unique pair'), )
 
     def __str__(self):
         return self.user

@@ -1,7 +1,7 @@
 import tempfile
 import shutil
 from django.contrib.auth import get_user_model
-from posts.forms import PostForm
+from posts.forms import PostForm, CommentForm
 from posts.models import Post, Group, Comment
 from django.conf import settings
 from django.test import Client, TestCase, override_settings
@@ -102,6 +102,35 @@ class PostFormTests(TestCase):
         )
         self.assertEqual(Post.objects.count(), post_count)
         self.assertEqual(response.status_code, HTTPStatus.OK)
+
+
+class PostFormTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create_user(username='auth')
+        cls.group = Group.objects.create(
+            title='Тестовая группа',
+            slug='test-slug',
+            description='Тестовое описание',
+        )
+        cls.post = Post.objects.create(
+            author=cls.user,
+            text='text',
+            group=cls.group,
+        )
+        cls.comment = Comment.objects.create(
+            text='текст',
+            post=cls.post,
+            author=cls.user
+        )
+        cls.form = CommentForm()
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='Andrey')
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.user)
+        self.authorized_client.force_login(self.post.author)
 
     def test_create_comment(self):
         comment_count = Comment.objects.count()
