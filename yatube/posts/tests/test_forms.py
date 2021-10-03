@@ -104,7 +104,7 @@ class PostFormTests(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
 
-class PostFormTests(TestCase):
+class CommentFormTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -130,7 +130,6 @@ class PostFormTests(TestCase):
         self.user = User.objects.create_user(username='Andrey')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
-        self.authorized_client.force_login(self.post.author)
 
     def test_create_comment(self):
         comment_count = Comment.objects.count()

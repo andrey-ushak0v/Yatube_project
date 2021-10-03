@@ -13,21 +13,21 @@
               Дата публикации: {{ post_detail.pub_date|date:"d E Y" }} 
             </li>
              {% if post_detail.group %}   
-              <li class="list-group-item">
-                Группа: {{ post_detail.group }}
-                <a href="{% url 'posts:group_list' post_detail.group.slug %}">
-                  все записи группы
-                </a>
+                <li class="list-group-item">
+                  Группа: {{ post_detail.group }}
+                  <a href="{% url 'posts:group_list' post_detail.group.slug %}">
+                    все записи группы
+                  </a>
              
-              </li>
+                </li>
               
-              <li class="list-group-item">
-                Автор: {{ post_detail.author.get_full_name }}
-              </li>
+                <li class="list-group-item">
+                  Автор: {{ post_detail.author.get_full_name }}
+                </li>
               
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-              Всего постов автора:  <span >{{ amount }}</span>
-            </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                Всего постов автора:  <span >{{ amount }}</span>
+              </li>
             {%endif%}
             <li class="list-group-item">
               <a href="{% url 'posts:profile' post_detail.author %}">
